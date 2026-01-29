@@ -1,3 +1,4 @@
+import csv
 import os
 import re
 from zipfile import ZipFile
@@ -6,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from constants import *
+from csv_parsing import parse_csv
 
 
 def get_html(url):
@@ -27,13 +29,26 @@ def unzip_files(file_paths):
             zObject.extractall(path=DOWNLOAD_DIR)
 
 
-def get_local_download_paths():
+def get_local_zip_files():
     files_list = os.listdir(DOWNLOAD_DIR)
     abs_src = os.path.abspath(DOWNLOAD_DIR)
 
     file_paths = []
     for file in files_list:
-        file_paths.append(os.path.join(abs_src, file))
+        if file.endswith(".zip"):
+            file_paths.append(os.path.join(abs_src, file))
+
+    return file_paths
+
+
+def get_local_csv_files():
+    files_list = os.listdir(DOWNLOAD_DIR)
+    abs_src = os.path.abspath(DOWNLOAD_DIR)
+
+    file_paths = []
+    for file in files_list:
+        if file.endswith(".csv"):
+            file_paths.append(os.path.join(abs_src, file))
 
     return file_paths
 
@@ -46,7 +61,7 @@ def download_files(files, file_names):
         if download.status_code == 200:
             with open(file_path, "wb") as file:
                 file.write(download.content)
-            print("File downloaded successfully")
+            print(f"File downloaded successfully at {os.path.abspath(file_path)}")
         else:
             print("Failed to download file")
 
@@ -75,7 +90,6 @@ def get_last_year_url(html, url):
     table_rows = soup.find_all("a")
 
     year = extract_last_year(table_rows)
-    print(year)
 
     build_url = url + year + "/"
     return build_url
@@ -103,7 +117,9 @@ def download_last_three_files():
 
     download_files(files_url, files_name)
 
-    file_paths = get_local_download_paths()
-    print("File paths: ", file_paths)
+    zip_file_paths = get_local_zip_files()
 
-    unzip_files(file_paths)
+    unzip_files(zip_file_paths)
+    csv_file_paths = get_local_csv_files()
+
+    parse_csv(csv_file_paths)
