@@ -27,6 +27,7 @@ def unzip_files(file_paths):
     for file in file_paths:
         with ZipFile(file, "r") as zObject:
             zObject.extractall(path=DOWNLOAD_DIR)
+            print(f"{file} extracted successfully!")
 
 
 def get_local_zip_files():
@@ -113,13 +114,16 @@ def download_last_three_files():
 
     years_page_html = get_html(build_url)
 
-    files_url, files_name = get_files_url(years_page_html, build_url)
-
-    download_files(files_url, files_name)
-
     zip_file_paths = get_local_zip_files()
+    if len(zip_file_paths) == 0:
+        files_url, files_name = get_files_url(years_page_html, build_url)
+        download_files(files_url, files_name)
 
-    unzip_files(zip_file_paths)
     csv_file_paths = get_local_csv_files()
+
+    if len(csv_file_paths) == 0:
+        zip_file_paths = get_local_zip_files()
+        unzip_files(zip_file_paths)
+        csv_file_paths = get_local_csv_files()
 
     parse_csv(csv_file_paths)
