@@ -1,0 +1,31 @@
+import { customRef } from 'vue'
+
+export function useDebounce(value, delay = 200) {
+  let timeout
+  return customRef((track, trigger) => {
+    return {
+      get() {
+        track()
+        return value
+      },
+      set(newValue) {
+        clearTimeout(timeout)
+        timeout = setTimeout(() => {
+          value = newValue
+          trigger()
+        }, delay)
+      },
+    }
+  })
+}
+
+export function useDebounceFn(fn, delay) {
+  let timeoutId = null;
+
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
