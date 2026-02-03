@@ -62,7 +62,7 @@ CREATE TABLE despesas_consolidadas (
     cd_conta_contabil VARCHAR(50) NOT NULL,
     ano INTEGER NOT NULL,
     trimestre INTEGER NOT NULL,
-    valor_despesas DECIMAL(20,2) NOT NULL,
+    valor_despesas FLOAT NOT NULL,
     data_carga TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
